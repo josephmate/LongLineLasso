@@ -1,0 +1,11 @@
+- pattern match and print 128 character context before and after
+- put together tests with gigantic files
+- option to adjust before, after, both context
+- option to print character offsets of each match
+- option to split based on pattern instead of search for matches
+- do match performance testing comparison with
+  https://unix.stackexchange.com/questions/163726/limit-grep-context-to-n-characters-on-line/548716?noredirect=1#comment1183864_548716
+- do split performance testing comparison with sed 's/pattern/\npattern/g'
+- how to install instructions
+- release binaries
+- share
