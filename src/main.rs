@@ -2,11 +2,13 @@ use clap::{App, Arg};
 use std::io;
 use std::io::BufRead;
 use std::vec::Vec;
+use utf8_chars::{BufReadCharsExt};
+
 
 fn find_match(pattern: &str) {
-  println!("{:?}", io::stdin().lock().lines()
-    .map(|s| s.unwrap())
-    .collect::<Vec<String>>().join("\n"));
+  for c in io::stdin().lock().chars().map(|x| x.unwrap()) {
+    println!("{}", c);
+  }
 }
 
 fn main() {
