@@ -1,6 +1,7 @@
-- pattern match and print 128 character context before and after
+DONE pattern match and print 128 character context before and after
+DONE option to adjust before, after, both context
+- unit testing
 - put together tests with gigantic files
-- option to adjust before, after, both context
 - option to print character offsets of each match
 - option to split based on pattern instead of search for matches
 - do match performance testing comparison with
