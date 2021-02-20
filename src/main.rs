@@ -5,8 +5,21 @@ use std::vec::Vec;
 use std::collections::VecDeque;
 use utf8_chars::{BufReadCharsExt};
 
+struct MatchIterator<'a> {
+  char_iter: &'a mut dyn Iterator<Item=char>,
+  pattern: String,
+  buffer_capacity: usize,
+  before_capacity: usize,
+  before_buffer: VecDeque<char>,
+  buffer: VecDeque<char>
+}
 
-fn find_match(char_iter: &mut dyn Iterator<Item=char>, pattern: &str, before_capacity: usize, after: usize) {
+fn matchIterator<'a>(
+  char_iter: &'a mut dyn Iterator<Item=char>,
+  pattern: String,
+  before_capacity: usize,
+  after: usize
+)-> MatchIterator<'a> {
   let buffer_capacity = after + pattern.len();
   let mut before_buffer: VecDeque<char> = VecDeque::with_capacity(before_capacity);
   let mut buffer: VecDeque<char> = VecDeque::with_capacity(buffer_capacity);
@@ -19,81 +32,104 @@ fn find_match(char_iter: &mut dyn Iterator<Item=char>, pattern: &str, before_cap
     }
   }
 
-  // 1. process the current character
-  // 2. remove the character from the buffer and place it into the before_buffer
-  // 3. if the before buffer is filled, remove the oldest character form the before_buffer
-  for c in char_iter {
-    // get the characters from the buffer to compare with the pattern
-    let mut comparee = String::new();
-    for i in 0 .. pattern.len() {
-      match buffer.pop_front() {
-        Some(j) =>  comparee.push(j),
-        None => break,
+  return MatchIterator {
+    char_iter: char_iter,
+    pattern: pattern,
+    buffer_capacity: buffer_capacity,
+    before_capacity: before_capacity,
+    before_buffer: before_buffer,
+    buffer: buffer
+  };
+}
+
+impl Iterator for MatchIterator<'_> {
+  type Item = String;
+
+  fn next(&mut self) -> Option<String> {
+    // 1. process the current character
+    // 2. remove the character from the buffer and place it into the before_buffer
+    // 3. if the before buffer is filled, remove the oldest character form the before_buffer
+
+    while let Some(c) = self.char_iter.next() {
+      // get the characters from the buffer to compare with the pattern
+      let mut comparee = String::new();
+      for i in 0 .. self.pattern.len() {
+        match self.buffer.pop_front() {
+          Some(j) =>  comparee.push(j),
+          None => break,
+        }
+      }
+
+      // put all the characters into the buffer except the first one
+      let mut put_back_iter = comparee.chars().rev();
+      for i in put_back_iter {
+        self.buffer.push_front(i);
+      }
+      if self.before_buffer.len() >= self.before_capacity {
+        self.before_buffer.pop_front();
+      }
+      // at this point buffer is at buffer_capacity
+
+      self.before_buffer.push_back(self.buffer.pop_front().unwrap());
+      // buffer is at buffer_capacity - 1 
+
+      // add another character so that we have buffer_capacity again
+      self.buffer.push_back(c);
+
+      // found a match, output it
+      if comparee == self.pattern {
+        let mut result = self.before_buffer.iter().collect::<String>();
+        result.push_str(&comparee);
+        result.push_str(&self.buffer.iter().collect::<String>());
+        return Some(result);      }
+    }
+
+    // process the remaining characters in the buffer
+    // can exit early if the buffer is smaller than the pattern
+    while self.buffer.len() >= self.pattern.len() {
+      // get the characters from the buffer to compare with the pattern
+      let mut comparee = String::new();
+      for i in 0 .. self.pattern.len() {
+        match self.buffer.pop_front() {
+          Some(j) =>  comparee.push(j),
+          None => break,
+        }
+      }
+
+      // put all the characters into the buffer except the first one
+      let mut put_back_iter = comparee.chars().rev();
+      for i in put_back_iter {
+        self.buffer.push_front(i);
+      }
+      if self.before_buffer.len() >= self.before_capacity {
+        self.before_buffer.pop_front();
+      }
+      self.before_buffer.push_back(self.buffer.pop_front().unwrap());
+
+      // found a match, output it
+      if comparee == self.pattern {
+        let mut result = self.before_buffer.iter().collect::<String>();
+        result.push_str(&comparee);
+        result.push_str(&self.buffer.iter().collect::<String>());
+        return Some(result);
       }
     }
 
-    // found a match, output it
-    if comparee == pattern {
-      println!("{}{}{}",
-        before_buffer.iter().collect::<String>(),
-        comparee,
-        buffer.iter().collect::<String>());
-    }
-
-    // put all the characters into the buffer except the first one
-    let mut put_back_iter = comparee.chars().rev();
-    for i in put_back_iter {
-      buffer.push_front(i);
-    }
-    if before_buffer.len() >= before_capacity {
-      before_buffer.pop_front();
-    }
-    // at this point buffer is at buffer_capacity
-
-    before_buffer.push_back(buffer.pop_front().unwrap());
-    // buffer is at buffer_capacity - 1 
-
-    // add another character so that we have buffer_capacity again
-    buffer.push_back(c);
-  }
-
-  // process the remaining characters in the buffer
-  // can exit early if the buffer is smaller than the pattern
-  while buffer.len() >= pattern.len() {
-    // get the characters from the buffer to compare with the pattern
-    let mut comparee = String::new();
-    for i in 0 .. pattern.len() {
-      match buffer.pop_front() {
-        Some(j) =>  comparee.push(j),
-        None => break,
-      }
-    }
-
-    // found a match, output it
-    if comparee == pattern {
-      println!("{}{}{}",
-        before_buffer.iter().collect::<String>(),
-        comparee,
-        buffer.iter().collect::<String>());
-    }
-
-    // put all the characters into the buffer except the first one
-    let mut put_back_iter = comparee.chars().rev();
-    for i in put_back_iter {
-      buffer.push_front(i);
-    }
-    if before_buffer.len() >= before_capacity {
-      before_buffer.pop_front();
-    }
-    before_buffer.push_back(buffer.pop_front().unwrap());
+    return None;
   }
 }
 
-fn find_match_std_io(pattern: &str, before_capacity: usize, after: usize) {
+fn find_match(char_iter: &mut dyn Iterator<Item=char>, pattern: &str, before_capacity: usize, after: usize) {
+
+}
+
+fn find_match_std_io<'a> (pattern: &'a str, before_capacity: usize, after: usize) {
   let mut stdin = io::stdin();
   let mut handler = stdin.lock();
   let mut char_iter = handler.chars().map(|x| x.unwrap());
-  find_match(&mut char_iter, pattern, before_capacity, after);
+  for found_match in matchIterator(& mut char_iter, pattern.to_string(), before_capacity, after) {
+    println!("{}", found_match);
+  }
 }
 
 fn main() {
@@ -139,3 +175,4 @@ fn main() {
       after
     );
 }
+
