@@ -1,7 +1,7 @@
 DONE pattern match and print 128 character context before and after
 DONE option to adjust before, after, both context
-- refactor to iterator so it can be unit tested (println makes it difficult)
-- unit testing
+DONE refactor to iterator so it can be unit tested (println makes it difficult)
+DONE unit testing
 - put together tests with gigantic files
 - option to print character offsets of each match
 - option to split based on pattern instead of search for matches

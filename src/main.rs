@@ -207,9 +207,99 @@ mod tests {
     }
 
     #[test]
+    fn test_empty_one_before() {
+      let input = &mut "".chars();
+      let mut result = matchIterator(input, "abc".to_string(), 1, 0);
+      assert_eq!(result.next(), None);
+    }
+
+    #[test]
+    fn test_empty_multi_before() {
+      let input = &mut "".chars();
+      let mut result = matchIterator(input, "abc".to_string(), 3, 0);
+      assert_eq!(result.next(), None);
+    }
+
+    #[test]
+    fn test_empty_one_after() {
+      let input = &mut "".chars();
+      let mut result = matchIterator(input, "abc".to_string(), 0, 1);
+      assert_eq!(result.next(), None);
+    }
+
+    #[test]
+    fn test_empty_multi_after() {
+      let input = &mut "".chars();
+      let mut result = matchIterator(input, "abc".to_string(), 0, 3);
+      assert_eq!(result.next(), None);
+    }
+
+    #[test]
+    fn test_empty_one_both() {
+      let input = &mut "".chars();
+      let mut result = matchIterator(input, "abc".to_string(), 1, 1);
+      assert_eq!(result.next(), None);
+    }
+
+    #[test]
+    fn test_empty_multi_both() {
+      let input = &mut "".chars();
+      let mut result = matchIterator(input, "abc".to_string(), 3, 3);
+      assert_eq!(result.next(), None);
+    }
+
+    #[test]
     fn test_only_match() {
       let input = &mut "abc".chars();
       let mut result = matchIterator(input, "abc".to_string(), 0, 0);
+      assert_eq!(result.next(), Some("abc".to_string()));
+      assert_eq!(result.next(), None);
+    }
+
+    #[test]
+    fn test_only_match_one_before() {
+      let input = &mut "abc".chars();
+      let mut result = matchIterator(input, "abc".to_string(), 1, 0);
+      assert_eq!(result.next(), Some("abc".to_string()));
+      assert_eq!(result.next(), None);
+    }
+
+    #[test]
+    fn test_only_match_multi_before() {
+      let input = &mut "abc".chars();
+      let mut result = matchIterator(input, "abc".to_string(), 3, 0);
+      assert_eq!(result.next(), Some("abc".to_string()));
+      assert_eq!(result.next(), None);
+    }
+
+    #[test]
+    fn test_only_match_one_after() {
+      let input = &mut "abc".chars();
+      let mut result = matchIterator(input, "abc".to_string(), 0, 1);
+      assert_eq!(result.next(), Some("abc".to_string()));
+      assert_eq!(result.next(), None);
+    }
+
+    #[test]
+    fn test_only_match_multi_after() {
+      let input = &mut "abc".chars();
+      let mut result = matchIterator(input, "abc".to_string(), 0, 3);
+      assert_eq!(result.next(), Some("abc".to_string()));
+      assert_eq!(result.next(), None);
+    }
+
+    #[test]
+    fn test_only_match_one_both() {
+      let input = &mut "abc".chars();
+      let mut result = matchIterator(input, "abc".to_string(), 1, 1);
+      assert_eq!(result.next(), Some("abc".to_string()));
+      assert_eq!(result.next(), None);
+    }
+
+    #[test]
+    fn test_only_match_multi_both() {
+      let input = &mut "abc".chars();
+      let mut result = matchIterator(input, "abc".to_string(), 3, 3);
       assert_eq!(result.next(), Some("abc".to_string()));
       assert_eq!(result.next(), None);
     }
@@ -220,6 +310,60 @@ mod tests {
       let mut result = matchIterator(input, "abc".to_string(), 0, 0);
       assert_eq!(result.next(), Some("abc".to_string()));
       assert_eq!(result.next(), Some("abc".to_string()));
+      assert_eq!(result.next(), None);
+    }
+    
+    #[test]
+    fn test_only_match_multiple_one_before() {
+      let input = &mut "abcabc".chars();
+      let mut result = matchIterator(input, "abc".to_string(), 1, 0);
+      assert_eq!(result.next(), Some("abc".to_string()));
+      assert_eq!(result.next(), Some("cabc".to_string()));
+      assert_eq!(result.next(), None);
+    }
+    
+    #[test]
+    fn test_only_match_multiple_multi_before() {
+      let input = &mut "abcabc".chars();
+      let mut result = matchIterator(input, "abc".to_string(), 3, 0);
+      assert_eq!(result.next(), Some("abc".to_string()));
+      assert_eq!(result.next(), Some("abcabc".to_string()));
+      assert_eq!(result.next(), None);
+    }
+    
+    #[test]
+    fn test_only_match_multiple_one_after() {
+      let input = &mut "abcabc".chars();
+      let mut result = matchIterator(input, "abc".to_string(), 0, 1);
+      assert_eq!(result.next(), Some("abca".to_string()));
+      assert_eq!(result.next(), Some("abc".to_string()));
+      assert_eq!(result.next(), None);
+    }
+    
+    #[test]
+    fn test_only_match_multiple_multi_after() {
+      let input = &mut "abcabc".chars();
+      let mut result = matchIterator(input, "abc".to_string(), 0, 3);
+      assert_eq!(result.next(), Some("abcabc".to_string()));
+      assert_eq!(result.next(), Some("abc".to_string()));
+      assert_eq!(result.next(), None);
+    }
+    
+    #[test]
+    fn test_only_match_multiple_one_both() {
+      let input = &mut "abcabc".chars();
+      let mut result = matchIterator(input, "abc".to_string(), 1, 1);
+      assert_eq!(result.next(), Some("abca".to_string()));
+      assert_eq!(result.next(), Some("cabc".to_string()));
+      assert_eq!(result.next(), None);
+    }
+    
+    #[test]
+    fn test_only_match_multiple_multi_both() {
+      let input = &mut "abcabc".chars();
+      let mut result = matchIterator(input, "abc".to_string(), 3, 3);
+      assert_eq!(result.next(), Some("abcabc".to_string()));
+      assert_eq!(result.next(), Some("abcabc".to_string()));
       assert_eq!(result.next(), None);
     }
 }
