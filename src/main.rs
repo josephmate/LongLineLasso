@@ -60,6 +60,16 @@ impl Iterator for MatchIterator<'_> {
         }
       }
 
+      // found a match, record it to send later
+      let current_result = if comparee == self.pattern {
+        let mut result = self.before_buffer.iter().collect::<String>();
+        result.push_str(&comparee);
+        result.push_str(&self.buffer.iter().collect::<String>());
+        Some(result)
+      } else {
+        None
+      };
+
       // put all the characters into the buffer except the first one
       let mut put_back_iter = comparee.chars().rev();
       for i in put_back_iter {
@@ -72,21 +82,17 @@ impl Iterator for MatchIterator<'_> {
 
       let leaving_buffer = self.buffer.pop_front().unwrap();
       // buffer is at buffer_capacity - 1 
-      if self.before_buffer.len() >= self.before_capacity {
+      if self.before_buffer.len() < self.before_capacity {
         self.before_buffer.push_back(leaving_buffer);
       }
 
       // add another character so that we have buffer_capacity again
       self.buffer.push_back(c);
 
-      // found a match, output it
-      if comparee == self.pattern {
-        let mut result = self.before_buffer.iter().collect::<String>();
-        result.push_str(":::");
-        result.push_str(&comparee);
-        result.push_str(":::");
-        result.push_str(&self.buffer.iter().collect::<String>());
-        return Some(result);      }
+      // found a match, return it
+      if current_result.is_some() {
+        return current_result;
+      }
     }
 
     // process the remaining characters in the buffer
@@ -101,6 +107,16 @@ impl Iterator for MatchIterator<'_> {
         }
       }
 
+      // found a match, record it to send later
+      let current_result = if comparee == self.pattern {
+        let mut result = self.before_buffer.iter().collect::<String>();
+        result.push_str(&comparee);
+        result.push_str(&self.buffer.iter().collect::<String>());
+        Some(result)
+      } else {
+        None
+      };
+
       // put all the characters into the buffer except the first one
       let mut put_back_iter = comparee.chars().rev();
       for i in put_back_iter {
@@ -111,17 +127,13 @@ impl Iterator for MatchIterator<'_> {
       }
       let leaving_buffer = self.buffer.pop_front().unwrap();
       // buffer is at buffer_capacity - 1 
-      if self.before_buffer.len() >= self.before_capacity {
+      if self.before_buffer.len() < self.before_capacity {
         self.before_buffer.push_back(leaving_buffer);
       }
-      // found a match, output it
-      if comparee == self.pattern {
-        let mut result = self.before_buffer.iter().collect::<String>();
-        result.push_str(":::");
-        result.push_str(&comparee);
-        result.push_str(":::");
-        result.push_str(&self.buffer.iter().collect::<String>());
-        return Some(result);
+      
+      // found a match, return it
+      if current_result.is_some() {
+        return current_result;
       }
     }
 
