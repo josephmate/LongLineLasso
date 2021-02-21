@@ -1,5 +1,5 @@
 [package]
-name = "LongLineLasso"
+name = "generate_large_files"
 version = "0.0.1"
 authors = ["Joseph Mate <mate.joseph@gmail.com>"]
 edition = "2018"
@@ -8,9 +8,4 @@ edition = "2018"
 
 [dependencies]
 clap = "3.0.0-beta.2"
-utf8-chars = "1.0.0"
-
-[[bin]]
-bench = false
-path = "src/main.rs"
-name = "lll"
+rand = "0.8.3"
