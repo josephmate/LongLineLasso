@@ -70,8 +70,11 @@ impl Iterator for MatchIterator<'_> {
       }
       // at this point buffer is at buffer_capacity
 
-      self.before_buffer.push_back(self.buffer.pop_front().unwrap());
+      let leaving_buffer = self.buffer.pop_front().unwrap();
       // buffer is at buffer_capacity - 1 
+      if self.before_buffer.len() >= self.before_capacity {
+        self.before_buffer.push_back(leaving_buffer);
+      }
 
       // add another character so that we have buffer_capacity again
       self.buffer.push_back(c);
@@ -79,7 +82,9 @@ impl Iterator for MatchIterator<'_> {
       // found a match, output it
       if comparee == self.pattern {
         let mut result = self.before_buffer.iter().collect::<String>();
+        result.push_str(":::");
         result.push_str(&comparee);
+        result.push_str(":::");
         result.push_str(&self.buffer.iter().collect::<String>());
         return Some(result);      }
     }
@@ -104,12 +109,17 @@ impl Iterator for MatchIterator<'_> {
       if self.before_buffer.len() >= self.before_capacity {
         self.before_buffer.pop_front();
       }
-      self.before_buffer.push_back(self.buffer.pop_front().unwrap());
-
+      let leaving_buffer = self.buffer.pop_front().unwrap();
+      // buffer is at buffer_capacity - 1 
+      if self.before_buffer.len() >= self.before_capacity {
+        self.before_buffer.push_back(leaving_buffer);
+      }
       // found a match, output it
       if comparee == self.pattern {
         let mut result = self.before_buffer.iter().collect::<String>();
+        result.push_str(":::");
         result.push_str(&comparee);
+        result.push_str(":::");
         result.push_str(&self.buffer.iter().collect::<String>());
         return Some(result);
       }
@@ -117,10 +127,6 @@ impl Iterator for MatchIterator<'_> {
 
     return None;
   }
-}
-
-fn find_match(char_iter: &mut dyn Iterator<Item=char>, pattern: &str, before_capacity: usize, after: usize) {
-
 }
 
 fn find_match_std_io<'a> (pattern: &'a str, before_capacity: usize, after: usize) {
@@ -176,3 +182,32 @@ fn main() {
     );
 }
 
+#[cfg(test)]
+mod tests {
+    // Note this useful idiom: importing names from outer (for mod tests) scope.
+    use super::*;
+
+    #[test]
+    fn test_empty() {
+      let input = &mut "".chars();
+      let mut result = matchIterator(input, "abc".to_string(), 0, 0);
+      assert_eq!(result.next(), None);
+    }
+
+    #[test]
+    fn test_only_match() {
+      let input = &mut "abc".chars();
+      let mut result = matchIterator(input, "abc".to_string(), 0, 0);
+      assert_eq!(result.next(), Some("abc".to_string()));
+      assert_eq!(result.next(), None);
+    }
+
+    #[test]
+    fn test_only_match_multiple() {
+      let input = &mut "abcabc".chars();
+      let mut result = matchIterator(input, "abc".to_string(), 0, 0);
+      assert_eq!(result.next(), Some("abc".to_string()));
+      assert_eq!(result.next(), Some("abc".to_string()));
+      assert_eq!(result.next(), None);
+    }
+}
