@@ -1,13 +1,26 @@
 cd ..\
-cargo build
+cargo build --release
 cd performance_testing
+
+function Run-LLL {
+  param (
+      $TextFile, $RepeatedText, $NumChars
+  )
+  Get-Content -Raw -Path $TextFile   | ../target/release/lll.exe --pattern $RepeatedText --before 100 --after 100 > tmp\matches.lll.$NumChars.txt
+}
+function Run-RG {
+  param (
+      $TextFile, $RepeatedText, $NumChars
+  )
+  Get-Content -Raw -Path $TextFile  | rg -r -E -o ".{0,100}$RepeatedText.{0,100}" > tmp\matches.rg.$NumChars.txt
+}
 
 #      1,000,000
 #     10,000,000
 #    100,000,000
 #  1,000,000,000
 #foreach ($num_chars in 1000000, 10000000, 100000000, 1000000000) {
-foreach ($num_chars in 1000000) {
+foreach ($num_chars in 1000000, 10000000, 100000000) {
   Get-Location
   $text_file = "tmp\large_file.$num_chars.txt"
   $repeated_file = "tmp\repeated.$num_chars.txt"
@@ -18,16 +31,8 @@ foreach ($num_chars in 1000000) {
       $repeated_text = Get-Content -Raw -Path $repeated_file
       $repeated_text
 
-      $lllScriptBlock={
-        Get-Content -Raw -Path $text_file   | ../target/debug/lll.exe --pattern $repeated_text --before 100 --after 100 > tmp\matches.lll.$num_chars.txt
-      }
-      # https://unix.stackexchange.com/questions/163726/limit-grep-context-to-n-characters-on-line/548716?noredirect=1#comment1183864_548716
-      $rgScriptBlock={
-        Get-Content -Raw -Path $text_file  | rg -r -E -o ".{0,100}$repeated_text.{0,100}" > tmp\matches.rg.$num_chars.txt
-      }
-
-      (Measure-Command  -Expression $lllScriptBlock).Milliseconds
-      (Measure-Command  -Expression $rgScriptBlock).Milliseconds
+      (Measure-Command  {Run-LLL -TextFile $text_file -RepeatedText $repeated_file -NumChars $num_chars}).TotalMilliseconds
+      (Measure-Command  {Run-RG -TextFile $text_file -RepeatedText $repeated_file -NumChars $num_chars}).TotalMilliseconds
     } else {
       {"$repeated_file does not exist. run .\generate_files.ps1"}
     }
