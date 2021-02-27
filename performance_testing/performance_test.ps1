@@ -2,17 +2,27 @@ cd ..\
 cargo build --release
 cd performance_testing
 
-function Run-LLL {
+function Invoke-LLL {
   param (
       $TextFile, $RepeatedText, $NumChars
   )
+  Write-Output "LLL"
+  Write-Output $TextFile
+  Write-Output $RepeatedText
+  Write-Output $NumChars
   Get-Content -Raw -Path $TextFile   | ../target/release/lll.exe --pattern $RepeatedText --before 100 --after 100 > tmp\matches.lll.$NumChars.txt
+  # Get-Content -Raw -Path tmp\large_file.1000000.txt |  ..\target\release\lll.exe --before 100 --after 100 --pattern NhzvRcmLtIOtWgrpJPDcBHxS6E9PcLxFgXfWuOcTpPj4KLG9sCD5n10oSqIXGuAbSVdOts5Iig8xC7loejWL427M6AtG5pd5Xxhi > tmp\matches.lll.1000000.txt
 }
-function Run-RG {
+function Invoke-RG {
   param (
       $TextFile, $RepeatedText, $NumChars
   )
-  Get-Content -Raw -Path $TextFile  | rg -r -E -o ".{0,100}$RepeatedText.{0,100}" > tmp\matches.rg.$NumChars.txt
+  Write-Output "RG"
+  Write-Output $TextFile
+  Write-Output $RepeatedText
+  Write-Output $NumChars
+  Get-Content -Raw -Path $TextFile  | rg --only-matching ".{0,100}$RepeatedText.{0,100}" > tmp\matches.rg.$NumChars.txt
+  # Get-Content -Raw -Path tmp\large_file.1000000.txt  | rg --only-matching ".{0,100}NhzvRcmLtIOtWgrpJPDcBHxS6E9PcLxFgXfWuOcTpPj4KLG9sCD5n10oSqIXGuAbSVdOts5Iig8xC7loejWL427M6AtG5pd5Xxhi.{0,100}" > tmp\matches.rg.1000000.txt
 }
 
 #      1,000,000
@@ -31,8 +41,8 @@ foreach ($num_chars in 1000000, 10000000, 100000000) {
       $repeated_text = Get-Content -Raw -Path $repeated_file
       $repeated_text
 
-      (Measure-Command  {Run-LLL -TextFile $text_file -RepeatedText $repeated_file -NumChars $num_chars}).TotalMilliseconds
-      (Measure-Command  {Run-RG -TextFile $text_file -RepeatedText $repeated_file -NumChars $num_chars}).TotalMilliseconds
+      (Measure-Command  {Invoke-LLL -TextFile $text_file -RepeatedText $repeated_text -NumChars $num_chars | Out-Default}).TotalMilliseconds
+      (Measure-Command  {Invoke-RG -TextFile $text_file -RepeatedText $repeated_text -NumChars $num_chars | Out-Default}).TotalMilliseconds
     } else {
       {"$repeated_file does not exist. run .\generate_files.ps1"}
     }
