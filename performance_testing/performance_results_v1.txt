@@ -1,0 +1,39 @@
+tmp/large_file.1000000.txt
+tmp/repeated.1000000.txt
+NhzvRcmLtIOtWgrpJPDcBHxS6E9PcLxFgXfWuOcTpPj4KLG9sCD5n10oSqIXGuAbSVdOts5Iig8xC7loejWL427M6AtG5pd5Xxhi
+lll
+
+real	0m1.123s
+user	0m1.103s
+sys	0m0.020s
+rg
+
+real	0m0.220s
+user	0m0.216s
+sys	0m0.004s
+tmp/large_file.10000000.txt
+tmp/repeated.10000000.txt
+sVX1TGBNC8kk9UEtcI3Em88uOpdHan69L6ZRSbHaUtTqMkHS3Yq6EGn7plFaZLLSsycSLAcumcvsOfue5nqGN49MDxvaR9yZbu4R
+lll
+
+real	0m10.127s
+user	0m10.118s
+sys	0m0.004s
+rg
+
+real	0m0.195s
+user	0m0.174s
+sys	0m0.021s
+tmp/large_file.100000000.txt
+tmp/repeated.100000000.txt
+EPGJewwdBI0L0fD5KNfW3zaGjumzz4PzSfaBbgejcpd9q2lKFXyLyoMvS8fe0uNUtHP4UjyQwB5PjbRPSVeYCklbajwEhqL79IM5
+lll
+
+real	1m41.556s
+user	1m41.464s
+sys	0m0.057s
+rg
+
+real	0m0.466s
+user	0m0.364s
+sys	0m0.101s
