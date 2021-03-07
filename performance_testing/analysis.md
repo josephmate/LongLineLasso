@@ -36,4 +36,15 @@ I reduce the number of characters I need to check.
 Only comparing the characters needed
 ===================
 Only comparing the characters need improved performance from 1m41.556s to 0m3.313s (30x).
+This sort of makes sense since the patterns are 100 characters long.
+I was expecting about a 100x improvement.
 
+utf8_chars::BufReadCharsExt::read_char_raw
+=========================================
+Reading the characters takes about 50% of the time now.
+I'm not sure where to go from here.
+I'm assuming that the bytes are read into a buffer,
+then we read the characters one by from from the buffer.
+Maybe we should try reading bytes and converting them directly to characters,
+assuming the are ascii to compare?
+Maybe we can make it a flag like `--ascii`?

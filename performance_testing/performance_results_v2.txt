@@ -3,50 +3,70 @@ tmp/repeated.1000000.txt
 NhzvRcmLtIOtWgrpJPDcBHxS6E9PcLxFgXfWuOcTpPj4KLG9sCD5n10oSqIXGuAbSVdOts5Iig8xC7loejWL427M6AtG5pd5Xxhi
 lll
 
-real	0m0.049s
-user	0m0.044s
-sys	0m0.005s
+real	0m0.052s
+user	0m0.048s
+sys	0m0.004s
 rg
 
-real	0m0.218s
-user	0m0.209s
-sys	0m0.009s
+real	0m0.219s
+user	0m0.207s
+sys	0m0.012s
+grep
+
+real	0m0.010s
+user	0m0.005s
+sys	0m0.005s
 tmp/large_file.10000000.txt
 tmp/repeated.10000000.txt
 sVX1TGBNC8kk9UEtcI3Em88uOpdHan69L6ZRSbHaUtTqMkHS3Yq6EGn7plFaZLLSsycSLAcumcvsOfue5nqGN49MDxvaR9yZbu4R
 lll
 
-real	0m0.343s
-user	0m0.334s
-sys	0m0.009s
+real	0m0.348s
+user	0m0.348s
+sys	0m0.000s
 rg
 
-real	0m0.198s
-user	0m0.182s
-sys	0m0.017s
+real	0m0.203s
+user	0m0.187s
+sys	0m0.016s
+grep
+
+real	0m0.042s
+user	0m0.016s
+sys	0m0.025s
 tmp/large_file.100000000.txt
 tmp/repeated.100000000.txt
 EPGJewwdBI0L0fD5KNfW3zaGjumzz4PzSfaBbgejcpd9q2lKFXyLyoMvS8fe0uNUtHP4UjyQwB5PjbRPSVeYCklbajwEhqL79IM5
 lll
 
-real	0m3.313s
-user	0m3.287s
-sys	0m0.025s
+real	0m3.293s
+user	0m3.259s
+sys	0m0.033s
 rg
 
-real	0m0.469s
-user	0m0.359s
-sys	0m0.108s
+real	0m0.472s
+user	0m0.378s
+sys	0m0.093s
+grep
+
+real	0m0.295s
+user	0m0.125s
+sys	0m0.170s
 tmp/large_file.1000000000.txt
 tmp/repeated.1000000000.txt
 UZ8tIIKa93I5DgQqTSpKDZxxIZbjWVSCnzAnyPrN9GsIRowR29m6Bkzrm6safUsbYjjCVkU4FYGXqMiUgteq7t2dTBfOyoGupTFb
 lll
 
-real	0m32.934s
-user	0m32.731s
-sys	0m0.192s
+real	0m32.819s
+user	0m32.570s
+sys	0m0.237s
 rg
 
-real	0m3.111s
-user	0m2.185s
-sys	0m0.922s
+real	0m3.086s
+user	0m2.126s
+sys	0m0.954s
+grep
+
+real	0m3.402s
+user	0m1.634s
+sys	0m1.754s

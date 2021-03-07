@@ -2,12 +2,25 @@ DONE pattern match and print 128 character context before and after
 DONE option to adjust before, after, both context
 DONE refactor to iterator so it can be unit tested (println makes it difficult)
 DONE unit testing
-- put together tests with gigantic files
-- do match performance testing comparison with
-  https://unix.stackexchange.com/questions/163726/limit-grep-context-to-n-characters-on-line/548716?noredirect=1#comment1183864_548716
-- option to print character offsets of each match
+DONE put together tests with gigantic files
+DONE do match performance testing comparison with
+     https://unix.stackexchange.com/questions/163726/limit-grep-context-to-n-characters-on-line/548716?noredirect=1#comment1183864_548716
+DONE figure out how to do performance analysis
+DONE tackle first performance bottleneck
+- try assuming 1 byte per char. if that gets performance better than rg, that's
+  good enough for now
 - option to split based on pattern instead of search for matches
 - do split performance testing comparison with sed 's/pattern/\npattern/g'
+- motivation
+	- large files misbehaving in less and vim
+	- grep handles it in a clunky way https://unix.stackexchange.com/questions/163726/limit-grep-context-to-n-characters-on-line/548716?noredirect=1#comment1183864_548716
+	- lets see how sed performs
+- when to use this tool
+	- 1GB lines
+- when not to use this tool
+	- regex
+	- UTF-8: grep and ripgrep are faster
 - how to install instructions
 - release binaries
 - share
+- option to print character offsets of each match

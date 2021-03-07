@@ -15,6 +15,13 @@ function invoke_rg {
   rg --only-matching ".{0,100}$repeated_text.{0,100}" > tmp/matches.rg.$num_chars.txt < $text_file
 }
 
+function invoke_grep {
+  text_file=$1
+  repeated_text=$2
+  num_chars=$3
+  grep --only-matching ".{0,100}$repeated_text.{0,100}" > tmp/matches.grep.$num_chars.txt < $text_file
+}
+
 
 if test -f "../target/release/lll"; then
 	#      1,000,000    1 MB
@@ -37,6 +44,8 @@ if test -f "../target/release/lll"; then
 				time invoke_lll "$text_file" "$repeated_text" "$num_chars"
 				echo rg
 				time invoke_rg "$text_file" "$repeated_text" "$num_chars"
+				echo grep
+				time invoke_grep "$text_file" "$repeated_text" "$num_chars"
 			else
 				echo "$repeated_file does not exist. run ./generate_files.sh"
 			fi

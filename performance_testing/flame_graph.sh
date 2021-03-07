@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 if test -f "../target/release/lll"; then
-	num_chars=10000000
+	num_chars=100000000
 	text_file="tmp/large_file.$num_chars.txt"
 	repeated_file="tmp/repeated.$num_chars.txt"
 	repeated_text=$(<$repeated_file)
