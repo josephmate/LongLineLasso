@@ -12,3 +12,6 @@ Cargo.lock
 
 # performance testing generates very large files
 /performance_testing/tmp
+
+# vim files
+*.swp
