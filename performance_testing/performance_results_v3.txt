@@ -1,0 +1,92 @@
+tmp/large_file.1000000.txt
+tmp/repeated.1000000.txt
+NhzvRcmLtIOtWgrpJPDcBHxS6E9PcLxFgXfWuOcTpPj4KLG9sCD5n10oSqIXGuAbSVdOts5Iig8xC7loejWL427M6AtG5pd5Xxhi
+lll
+
+real	0m0.050s
+user	0m0.046s
+sys	0m0.004s
+lll_ascii
+
+real	0m0.033s
+user	0m0.033s
+sys	0m0.001s
+rg
+
+real	0m0.217s
+user	0m0.212s
+sys	0m0.005s
+grep
+
+real	0m0.005s
+user	0m0.000s
+sys	0m0.005s
+tmp/large_file.10000000.txt
+tmp/repeated.10000000.txt
+sVX1TGBNC8kk9UEtcI3Em88uOpdHan69L6ZRSbHaUtTqMkHS3Yq6EGn7plFaZLLSsycSLAcumcvsOfue5nqGN49MDxvaR9yZbu4R
+lll
+
+real	0m0.361s
+user	0m0.357s
+sys	0m0.005s
+lll_ascii
+
+real	0m0.257s
+user	0m0.245s
+sys	0m0.013s
+rg
+
+real	0m0.198s
+user	0m0.189s
+sys	0m0.009s
+grep
+
+real	0m0.036s
+user	0m0.016s
+sys	0m0.020s
+tmp/large_file.100000000.txt
+tmp/repeated.100000000.txt
+EPGJewwdBI0L0fD5KNfW3zaGjumzz4PzSfaBbgejcpd9q2lKFXyLyoMvS8fe0uNUtHP4UjyQwB5PjbRPSVeYCklbajwEhqL79IM5
+lll
+
+real	0m3.484s
+user	0m3.438s
+sys	0m0.044s
+lll_ascii
+
+real	0m2.507s
+user	0m2.478s
+sys	0m0.029s
+rg
+
+real	0m0.466s
+user	0m0.362s
+sys	0m0.104s
+grep
+
+real	0m0.295s
+user	0m0.147s
+sys	0m0.148s
+tmp/large_file.1000000000.txt
+tmp/repeated.1000000000.txt
+UZ8tIIKa93I5DgQqTSpKDZxxIZbjWVSCnzAnyPrN9GsIRowR29m6Bkzrm6safUsbYjjCVkU4FYGXqMiUgteq7t2dTBfOyoGupTFb
+lll
+
+real	0m34.421s
+user	0m34.186s
+sys	0m0.224s
+lll_ascii
+
+real	0m24.379s
+user	0m24.163s
+sys	0m0.208s
+rg
+
+real	0m3.121s
+user	0m2.143s
+sys	0m0.973s
+grep
+
+real	0m3.397s
+user	0m1.663s
+sys	0m1.723s

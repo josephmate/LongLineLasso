@@ -11,6 +11,7 @@ if test -f "../target/release/lll"; then
 		--call-graph dwarf \
 		--output tmp/lll.perf.out \
 		../target/release/lll \
+		  --ascii \
 			--pattern $repeated_text \
 			--before 100 \
 			--after 100 \

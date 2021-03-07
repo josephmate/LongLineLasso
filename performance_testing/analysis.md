@@ -48,3 +48,17 @@ then we read the characters one by from from the buffer.
 Maybe we should try reading bytes and converting them directly to characters,
 assuming the are ascii to compare?
 Maybe we can make it a flag like `--ascii`?
+
+Dropping utf_chars in favour of only ascii
+==========================================
+Performance experiments show a drop from 34 to 24 seconds.
+This improvement is much smaller than I was expecting.
+By using ascii, I was hoping that I would have similar performance to grep and rg.
+Looks like we need to keep digging.
+
+std::io::buffered::BufReader<R> as std::io::Read>::read
+===================
+25% of the time is spent here.
+I'm not sure what else I can do.
+Maybe read is not buffered, even though we're using BufRead.
+Maybe we need to buffer it ourselfs?

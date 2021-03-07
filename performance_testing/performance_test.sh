@@ -5,21 +5,41 @@ function invoke_lll {
   text_file=$1
   repeated_text=$2
   num_chars=$3
-  ../target/release/lll --pattern $repeated_text --before 100 --after 100 > tmp/matches.lll.$num_chars.txt < $text_file
+  ../target/release/lll \
+		--pattern $repeated_text \
+		--before 100 \
+		--after 100 \
+		> tmp/matches.lll.$num_chars.txt < $text_file
+}
+
+function invoke_lll_ascii {
+  text_file=$1
+  repeated_text=$2
+  num_chars=$3
+  ../target/release/lll \
+		--ascii \
+		--pattern $repeated_text \
+		--before 100 \
+		--after 100 \
+		> tmp/matches.lll_ascii.$num_chars.txt < $text_file
 }
 
 function invoke_rg {
   text_file=$1
   repeated_text=$2
   num_chars=$3
-  rg --only-matching ".{0,100}$repeated_text.{0,100}" > tmp/matches.rg.$num_chars.txt < $text_file
+  rg \
+		--only-matching ".{0,100}$repeated_text.{0,100}" \
+		> tmp/matches.rg.$num_chars.txt < $text_file
 }
 
 function invoke_grep {
   text_file=$1
   repeated_text=$2
   num_chars=$3
-  grep --only-matching ".{0,100}$repeated_text.{0,100}" > tmp/matches.grep.$num_chars.txt < $text_file
+  grep \
+		--only-matching ".{0,100}$repeated_text.{0,100}" \
+		> tmp/matches.grep.$num_chars.txt < $text_file
 }
 
 
@@ -42,6 +62,8 @@ if test -f "../target/release/lll"; then
 
 				echo lll
 				time invoke_lll "$text_file" "$repeated_text" "$num_chars"
+				echo lll_ascii
+				time invoke_lll_ascii "$text_file" "$repeated_text" "$num_chars"
 				echo rg
 				time invoke_rg "$text_file" "$repeated_text" "$num_chars"
 				echo grep
