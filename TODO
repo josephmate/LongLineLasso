@@ -9,8 +9,10 @@ DONE figure out how to do performance analysis
 DONE tackle first performance bottleneck
 DONE try assuming 1 byte per char. if that gets performance better than rg, that's
      good enough for now
-- option to split based on pattern instead of search for matches
-- do split performance testing comparison with sed 's/pattern/\npattern/g'
+DONE do split performance testing comparison with sed 's/pattern/\npattern/g'
+	Even though we haven't fully optimized, we're better than sed. Nice!
+- option to append after pattern instead of search for matches
+- option to replace pattern instead of search for matches
 - motivation
 	- large files misbehaving in less and vim
 	- grep handles it in a clunky way https://unix.stackexchange.com/questions/163726/limit-grep-context-to-n-characters-on-line/548716?noredirect=1#comment1183864_548716

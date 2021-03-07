@@ -62,3 +62,12 @@ std::io::buffered::BufReader<R> as std::io::Read>::read
 I'm not sure what else I can do.
 Maybe read is not buffered, even though we're using BufRead.
 Maybe we need to buffer it ourselfs?
+
+vs. sed and tr
+=============
+I'm happy that lll peforms better than sed.
+However, my goal is for lll to peform as close as possible to tr.
+This is achievable because we're not doing regex,
+we're only appending or replacing based on a string,
+which I expect to have similar performance to replacing based on a character.
+
