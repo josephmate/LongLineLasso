@@ -13,7 +13,7 @@ foreach ($num_chars in 1000000, 10000000, 100000000, 1000000000) {
   if (Test-Path $large_file -PathType leaf) {
     Write-Output "$large_file already exists. please delete it and run again"
   } else {
-    Write-Output "Generated $num_chars file $large_file"
+    Write-Output "Generating $num_chars file $large_file"
     ..\generate_large_files\target\release\generate_large_files.exe --characters $num_chars --repeated_text_length 100 --times 1000 --out $large_file --repeated_text_file $repeated_file
   }
 }

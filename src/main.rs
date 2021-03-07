@@ -8,7 +8,8 @@ struct MatchIterator<'a> {
   pattern: String,
   before_capacity: usize,
   before_buffer: VecDeque<char>,
-  buffer: VecDeque<char>
+  buffer: VecDeque<char>,
+  comparison_buffer: VecDeque<char>
 }
 
 fn match_iterator<'a>(
@@ -20,6 +21,7 @@ fn match_iterator<'a>(
   let buffer_capacity = after + pattern.len();
   let before_buffer: VecDeque<char> = VecDeque::with_capacity(before_capacity);
   let mut buffer: VecDeque<char> = VecDeque::with_capacity(buffer_capacity);
+  let comparison_buffer: VecDeque<char> = VecDeque::with_capacity(buffer_capacity);
 
   // fill the buffer so there's enough to print the after characters
   for _ in 0 .. buffer_capacity {
@@ -34,7 +36,8 @@ fn match_iterator<'a>(
     pattern: pattern,
     before_capacity: before_capacity,
     before_buffer: before_buffer,
-    buffer: buffer
+    buffer: buffer,
+    comparison_buffer: comparison_buffer
   };
 }
 
@@ -48,18 +51,27 @@ impl Iterator for MatchIterator<'_> {
 
     while let Some(c) = self.char_iter.next() {
       // get the characters from the buffer to compare with the pattern
-      let mut comparee = String::new();
-      for _ in 0 .. self.pattern.len() {
+      let mut matched = true;
+      for pattern_char in self.pattern.chars() {
         match self.buffer.pop_front() {
-          Some(j) =>  comparee.push(j),
-          None => break,
+          Some(input_char) => {
+              self.comparison_buffer.push_back(input_char);
+              if pattern_char != input_char {
+                  matched = false; // too short
+                  break;
+              }
+          },
+          None => {
+              matched = false; // too short
+              break;
+          },
         }
       }
 
       // found a match, record it to send later
-      let current_result = if comparee == self.pattern {
+      let current_result = if matched {
         let mut result = self.before_buffer.iter().collect::<String>();
-        result.push_str(&comparee);
+        result.push_str(&self.comparison_buffer.iter().collect::<String>());
         result.push_str(&self.buffer.iter().collect::<String>());
         Some(result)
       } else {
@@ -67,15 +79,13 @@ impl Iterator for MatchIterator<'_> {
       };
 
       // put all the characters into the buffer except the first one
-      let put_back_iter = comparee.chars().rev();
-      for i in put_back_iter {
-        self.buffer.push_front(i);
+      while let Some(put_back_char) = self.comparison_buffer.pop_back() {
+        self.buffer.push_front(put_back_char);
       }
       if self.before_buffer.len() >= self.before_capacity {
         self.before_buffer.pop_front();
       }
       // at this point buffer is at buffer_capacity
-
       let leaving_buffer = self.buffer.pop_front().unwrap();
       // buffer is at buffer_capacity - 1 
       if self.before_buffer.len() < self.before_capacity {
@@ -95,18 +105,27 @@ impl Iterator for MatchIterator<'_> {
     // can exit early if the buffer is smaller than the pattern
     while self.buffer.len() >= self.pattern.len() {
       // get the characters from the buffer to compare with the pattern
-      let mut comparee = String::new();
-      for _ in 0 .. self.pattern.len() {
+      let mut matched = true;
+      for pattern_char in self.pattern.chars() {
         match self.buffer.pop_front() {
-          Some(j) =>  comparee.push(j),
-          None => break,
+          Some(input_char) => {
+              self.comparison_buffer.push_back(input_char);
+              if pattern_char != input_char {
+                  matched = false; // too short
+                  break;
+              }
+          },
+          None => {
+              matched = false; // too short
+              break;
+          },
         }
       }
 
       // found a match, record it to send later
-      let current_result = if comparee == self.pattern {
+      let current_result = if matched {
         let mut result = self.before_buffer.iter().collect::<String>();
-        result.push_str(&comparee);
+        result.push_str(&self.comparison_buffer.iter().collect::<String>());
         result.push_str(&self.buffer.iter().collect::<String>());
         Some(result)
       } else {
@@ -114,9 +133,8 @@ impl Iterator for MatchIterator<'_> {
       };
 
       // put all the characters into the buffer except the first one
-      let put_back_iter = comparee.chars().rev();
-      for i in put_back_iter {
-        self.buffer.push_front(i);
+      while let Some(put_back_char) = self.comparison_buffer.pop_back() {
+        self.buffer.push_front(put_back_char);
       }
       if self.before_buffer.len() >= self.before_capacity {
         self.before_buffer.pop_front();

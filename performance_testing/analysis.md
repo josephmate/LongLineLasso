@@ -32,3 +32,8 @@ Hopefully by solving the String:push problem, I will also reduce this problem.
 By only popping the characters I need,
 until the first character does not match,
 I reduce the number of characters I need to check.
+
+Only comparing the characters needed
+===================
+Only comparing the characters need improved performance from 1m41.556s to 0m3.313s (30x).
+
