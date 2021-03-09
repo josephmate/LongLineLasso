@@ -1,5 +1,5 @@
 [package]
-name = "LongLineLasso"
+name = "long_line_lasso"
 version = "0.0.1"
 authors = ["Joseph Mate <mate.joseph@gmail.com>"]
 edition = "2018"
@@ -13,6 +13,10 @@ utf8-chars = "1.0.0"
 # for flame graph
 [profile.release]
 debug = true
+
+[lib]
+name = "lll"
+path = "src/lib.rs"
 
 [[bin]]
 bench = false
