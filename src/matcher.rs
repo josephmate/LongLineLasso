@@ -39,9 +39,9 @@ pub fn match_iterator<'a>(
 }
 
 impl Iterator for MatchIterator<'_> {
-  type Item = String;
+  type Item = (String, String, String);
 
-  fn next(&mut self) -> Option<String> {
+  fn next(&mut self) -> Option<(String,String,String)> {
     // 1. process the current character
     // 2. remove the character from the buffer and place it into the before_buffer
     // 3. if the before buffer is filled, remove the oldest character form the before_buffer
@@ -52,25 +52,26 @@ impl Iterator for MatchIterator<'_> {
       for pattern_char in self.pattern.chars() {
         match self.buffer.pop_front() {
           Some(input_char) => {
-              self.comparison_buffer.push_back(input_char);
-              if pattern_char != input_char {
-                  matched = false; // too short
-                  break;
-              }
-          },
-          None => {
+            self.comparison_buffer.push_back(input_char);
+            if pattern_char != input_char {
               matched = false; // too short
               break;
+            }
+          },
+          None => {
+            matched = false; // too short
+            break;
           },
         }
       }
 
       // found a match, record it to send later
       let current_result = if matched {
-        let mut result = self.before_buffer.iter().collect::<String>();
-        result.push_str(&self.comparison_buffer.iter().collect::<String>());
-        result.push_str(&self.buffer.iter().collect::<String>());
-        Some(result)
+        Some((
+          self.before_buffer.iter().collect::<String>(),
+          self.comparison_buffer.iter().collect::<String>(),
+          self.buffer.iter().collect::<String>()
+        ))
       } else {
         None
       };
@@ -121,10 +122,11 @@ impl Iterator for MatchIterator<'_> {
 
       // found a match, record it to send later
       let current_result = if matched {
-        let mut result = self.before_buffer.iter().collect::<String>();
-        result.push_str(&self.comparison_buffer.iter().collect::<String>());
-        result.push_str(&self.buffer.iter().collect::<String>());
-        Some(result)
+        Some((
+          self.before_buffer.iter().collect::<String>(),
+          self.comparison_buffer.iter().collect::<String>(),
+          self.buffer.iter().collect::<String>()
+        ))
       } else {
         None
       };
@@ -210,7 +212,7 @@ mod tests {
     fn test_only_match() {
       let input = &mut "abc".chars();
       let mut result = match_iterator(input, "abc".to_string(), 0, 0);
-      assert_eq!(result.next(), Some("abc".to_string()));
+      assert_eq!(result.next(), Some(("".to_string(), "abc".to_string(), "".to_string())));
       assert_eq!(result.next(), None);
     }
 
@@ -218,7 +220,7 @@ mod tests {
     fn test_only_match_one_before() {
       let input = &mut "abc".chars();
       let mut result = match_iterator(input, "abc".to_string(), 1, 0);
-      assert_eq!(result.next(), Some("abc".to_string()));
+      assert_eq!(result.next(), Some(("".to_string(), "abc".to_string(), "".to_string())));
       assert_eq!(result.next(), None);
     }
 
@@ -226,7 +228,7 @@ mod tests {
     fn test_only_match_multi_before() {
       let input = &mut "abc".chars();
       let mut result = match_iterator(input, "abc".to_string(), 3, 0);
-      assert_eq!(result.next(), Some("abc".to_string()));
+      assert_eq!(result.next(), Some(("".to_string(), "abc".to_string(), "".to_string())));
       assert_eq!(result.next(), None);
     }
 
@@ -234,7 +236,7 @@ mod tests {
     fn test_only_match_one_after() {
       let input = &mut "abc".chars();
       let mut result = match_iterator(input, "abc".to_string(), 0, 1);
-      assert_eq!(result.next(), Some("abc".to_string()));
+      assert_eq!(result.next(), Some(("".to_string(), "abc".to_string(), "".to_string())));
       assert_eq!(result.next(), None);
     }
 
@@ -242,7 +244,7 @@ mod tests {
     fn test_only_match_multi_after() {
       let input = &mut "abc".chars();
       let mut result = match_iterator(input, "abc".to_string(), 0, 3);
-      assert_eq!(result.next(), Some("abc".to_string()));
+      assert_eq!(result.next(), Some(("".to_string(), "abc".to_string(), "".to_string())));
       assert_eq!(result.next(), None);
     }
 
@@ -250,7 +252,7 @@ mod tests {
     fn test_only_match_one_both() {
       let input = &mut "abc".chars();
       let mut result = match_iterator(input, "abc".to_string(), 1, 1);
-      assert_eq!(result.next(), Some("abc".to_string()));
+      assert_eq!(result.next(), Some(("".to_string(), "abc".to_string(), "".to_string())));
       assert_eq!(result.next(), None);
     }
 
@@ -258,7 +260,7 @@ mod tests {
     fn test_only_match_multi_both() {
       let input = &mut "abc".chars();
       let mut result = match_iterator(input, "abc".to_string(), 3, 3);
-      assert_eq!(result.next(), Some("abc".to_string()));
+      assert_eq!(result.next(), Some(("".to_string(), "abc".to_string(), "".to_string())));
       assert_eq!(result.next(), None);
     }
 
@@ -266,8 +268,8 @@ mod tests {
     fn test_only_match_multiple() {
       let input = &mut "abcabc".chars();
       let mut result = match_iterator(input, "abc".to_string(), 0, 0);
-      assert_eq!(result.next(), Some("abc".to_string()));
-      assert_eq!(result.next(), Some("abc".to_string()));
+      assert_eq!(result.next(), Some(("".to_string(), "abc".to_string(), "".to_string())));
+      assert_eq!(result.next(), Some(("".to_string(), "abc".to_string(), "".to_string())));
       assert_eq!(result.next(), None);
     }
     
@@ -275,8 +277,8 @@ mod tests {
     fn test_only_match_multiple_one_before() {
       let input = &mut "abcabc".chars();
       let mut result = match_iterator(input, "abc".to_string(), 1, 0);
-      assert_eq!(result.next(), Some("abc".to_string()));
-      assert_eq!(result.next(), Some("cabc".to_string()));
+      assert_eq!(result.next(), Some(("".to_string(), "abc".to_string(), "".to_string())));
+      assert_eq!(result.next(), Some(("c".to_string(), "abc".to_string(), "".to_string())));
       assert_eq!(result.next(), None);
     }
     
@@ -284,8 +286,8 @@ mod tests {
     fn test_only_match_multiple_multi_before() {
       let input = &mut "abcabc".chars();
       let mut result = match_iterator(input, "abc".to_string(), 3, 0);
-      assert_eq!(result.next(), Some("abc".to_string()));
-      assert_eq!(result.next(), Some("abcabc".to_string()));
+      assert_eq!(result.next(), Some(("".to_string(), "abc".to_string(), "".to_string())));
+      assert_eq!(result.next(), Some(("abc".to_string(), "abc".to_string(), "".to_string())));
       assert_eq!(result.next(), None);
     }
     
@@ -293,8 +295,8 @@ mod tests {
     fn test_only_match_multiple_one_after() {
       let input = &mut "abcabc".chars();
       let mut result = match_iterator(input, "abc".to_string(), 0, 1);
-      assert_eq!(result.next(), Some("abca".to_string()));
-      assert_eq!(result.next(), Some("abc".to_string()));
+      assert_eq!(result.next(), Some(("".to_string(), "abc".to_string(), "a".to_string())));
+      assert_eq!(result.next(), Some(("".to_string(), "abc".to_string(), "".to_string())));
       assert_eq!(result.next(), None);
     }
     
@@ -302,8 +304,8 @@ mod tests {
     fn test_only_match_multiple_multi_after() {
       let input = &mut "abcabc".chars();
       let mut result = match_iterator(input, "abc".to_string(), 0, 3);
-      assert_eq!(result.next(), Some("abcabc".to_string()));
-      assert_eq!(result.next(), Some("abc".to_string()));
+      assert_eq!(result.next(), Some(("".to_string(), "abc".to_string(), "abc".to_string())));
+      assert_eq!(result.next(), Some(("".to_string(), "abc".to_string(), "".to_string())));
       assert_eq!(result.next(), None);
     }
     
@@ -311,8 +313,8 @@ mod tests {
     fn test_only_match_multiple_one_both() {
       let input = &mut "abcabc".chars();
       let mut result = match_iterator(input, "abc".to_string(), 1, 1);
-      assert_eq!(result.next(), Some("abca".to_string()));
-      assert_eq!(result.next(), Some("cabc".to_string()));
+      assert_eq!(result.next(), Some(("".to_string(), "abc".to_string(), "a".to_string())));
+      assert_eq!(result.next(), Some(("c".to_string(), "abc".to_string(), "".to_string())));
       assert_eq!(result.next(), None);
     }
     
@@ -320,8 +322,8 @@ mod tests {
     fn test_only_match_multiple_multi_both() {
       let input = &mut "abcabc".chars();
       let mut result = match_iterator(input, "abc".to_string(), 3, 3);
-      assert_eq!(result.next(), Some("abcabc".to_string()));
-      assert_eq!(result.next(), Some("abcabc".to_string()));
+      assert_eq!(result.next(), Some(("".to_string(), "abc".to_string(), "abc".to_string())));
+      assert_eq!(result.next(), Some(("abc".to_string(), "abc".to_string(), "".to_string())));
       assert_eq!(result.next(), None);
     }
 }

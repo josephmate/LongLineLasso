@@ -60,8 +60,8 @@ fn find_match_std_io<'a> (
   let stdin = io::stdin();
   let mut handler = stdin.lock();
   let mut char_iter  = get_iterator(&mut handler, is_ascii);
-  for found_match in match_iterator(& mut char_iter, pattern.to_string(), before_capacity, after) {
-    println!("{}", found_match);
+  for (before, found_match, after) in match_iterator(& mut char_iter, pattern.to_string(), before_capacity, after) {
+    println!("{}{}{}", before, found_match, after);
   }
 }
 
