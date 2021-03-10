@@ -54,13 +54,19 @@ impl Iterator for CharIterator<'_> {
 fn find_match_std_io<'a> (
     pattern: &'a str,
     before_capacity: usize,
-    after: usize,
-    is_ascii: bool
+    after_capacity: usize,
+    is_ascii: bool,
+    _replace: Option<&str>,
+    _prepend: Option<&str>,
+    _append: Option<&str>
 ) {
   let stdin = io::stdin();
   let mut handler = stdin.lock();
   let mut char_iter  = get_iterator(&mut handler, is_ascii);
-  for (before, found_match, after) in match_iterator(& mut char_iter, pattern.to_string(), before_capacity, after) {
+  for (before, found_match, after) in match_iterator(& mut char_iter, pattern.to_string(), before_capacity, after_capacity) {
+    // TODO: need to figure out some way to emit non-matches character by character.
+    // I think we need to change the interface to return String or char instead of (String,String,String).
+    // That tuple didn't work out like I planned it.
     println!("{}{}{}", before, found_match, after);
   }
 }
@@ -68,28 +74,45 @@ fn find_match_std_io<'a> (
 fn main() {
   let matches = App::new("LongLingLasso")
     .version("0.0.1")
-    .about("Find multiple matches in a GIANT line.\nSplit an inconveniently HUMONGOUS line multiple times.")
+    .about("Control gigantic lines. Print matches. Replace matches. Append after matches.")
     .author("Joseph Mate")
     .arg(Arg::new("pattern")
       .short('p')
       .long("pattern")
-      .value_name("PATTERN")
-      .about("The pattern to find matches for. Regexes are not supported")
+      .value_name("STRING")
+      .about("The string to find matches for. Regexes are not supported")
       .takes_value(true)
-      .required(true)
     )
     .arg(Arg::new("before")
       .short('b')
       .long("before")
       .value_name("INTEGER greater than or equal to 0")
-      .about("Number of characters to show before the match. Defaults to 128.")
+      .about("Number of characters to show before the match. Set to 0 if --replace or --append provided.")
       .takes_value(true)
     )
     .arg(Arg::new("after")
       .short('a')
       .long("after")
       .value_name("INTEGER greater than or equal to 0")
-      .about("Number of characters to show after the match. Defaults to 128.")
+      .about("Number of characters to show after the match. Defaults to 128. Set to 0 if --replace or --append provided.")
+      .takes_value(true)
+    )
+    .arg(Arg::new("replace")
+      .long("replace")
+      .value_name("STRING")
+      .about("Matches found will be replaced with this string.")
+      .takes_value(true)
+    )
+    .arg(Arg::new("append")
+      .long("append")
+      .value_name("STRING")
+      .about("This string will be appended after all occurences of your pattern.")
+      .takes_value(true)
+    )
+    .arg(Arg::new("prepend")
+      .long("prepend")
+      .value_name("STRING")
+      .about("This string will be prepended before all occurences of your pattern.")
       .takes_value(true)
     )
     .arg(Arg::new("ascii")
@@ -97,21 +120,32 @@ fn main() {
       .about("Assume input is ascii for improved performance")
     )
     .get_matches();
-    
-    let before = match matches.value_of("before"){
-      Some(before_str) => before_str.parse::<usize>().expect("--before must be an INTEGER >= 0"),
-      None => 128,
+    let disable_context = matches.is_present("replace") || matches.is_present("append");
+    let before = if disable_context {
+      0
+    } else {
+      match matches.value_of("before"){
+        Some(before_str) => before_str.parse::<usize>().expect("--before must be an INTEGER >= 0"),
+        None => 128,
+      }
     };
-    let after = match matches.value_of("after"){
-      Some(after_str) => after_str.parse::<usize>().expect("--after must be an INTEGER >= 0"),
-      None => 128,
+    let after = if disable_context {
+      0
+    } else {
+      match matches.value_of("after"){
+        Some(after_str) => after_str.parse::<usize>().expect("--after must be an INTEGER >= 0"),
+        None => 128,
+      }
     };
     let is_ascii  = matches.is_present("ascii");
     find_match_std_io(
       matches.value_of("pattern").expect("--pattern must be provided"),
       before,
       after,
-      is_ascii
+      is_ascii,
+      matches.value_of("replace"),
+      matches.value_of("prepend"),
+      matches.value_of("append")
     );
 }
 
