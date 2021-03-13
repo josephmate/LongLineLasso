@@ -63,11 +63,13 @@ fn find_match_std_io<'a> (
   let stdin = io::stdin();
   let mut handler = stdin.lock();
   let mut char_iter  = get_iterator(&mut handler, is_ascii);
-  for (before, found_match, after) in match_iterator(& mut char_iter, pattern.to_string(), before_capacity, after_capacity) {
-    // TODO: need to figure out some way to emit non-matches character by character.
-    // I think we need to change the interface to return String or char instead of (String,String,String).
-    // That tuple didn't work out like I planned it.
-    println!("{}{}{}", before, found_match, after);
+  for match_result in match_iterator(& mut char_iter, pattern.to_string(), before_capacity, after_capacity) {
+    match match_result {
+      MatchResult::Match(before, found_match, after) => {
+        println!("{}{}{}", before, found_match, after);
+      }
+      MatchResult::Unmatched(_unmatched_char) => {}
+    }
   }
 }
 
