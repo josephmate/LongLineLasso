@@ -51,7 +51,7 @@ impl Iterator for CharIterator<'_> {
 
 pub fn process_string_stream_bufread_bufwrite<'a> (
     bufread: &'a mut dyn BufRead,
-    bufwrite: &'a mut dyn Write,
+    bufwriter: &'a mut dyn Write,
     pattern: &'a str,
     before_capacity: usize,
     after_capacity: usize,
@@ -62,12 +62,37 @@ pub fn process_string_stream_bufread_bufwrite<'a> (
 ) {
   let mut char_iter  = get_iterator(bufread, is_ascii);
   if replace.is_some() || prepend.is_some() || append.is_some() {
-    // TODO
+    for match_result in match_iterator(& mut char_iter, pattern.to_string(), 0, 0) {
+      match match_result {
+        MatchResult::Match(_, found_match, _) => {
+          if prepend.is_some() {
+            write!(bufwriter, "{}", prepend.unwrap())
+              .expect("Unable to prepend to bufwriter do to io error.");
+          }
+          if replace.is_some() {
+            write!(bufwriter, "{}", replace.unwrap())
+              .expect("Unable to replace to bufwriter do to io error.");
+          } else {
+            write!(bufwriter, "{}", found_match)
+              .expect("Unable to write to bufwriter do to io error.");
+          }
+          if append.is_some() {
+            write!(bufwriter, "{}", append.unwrap())
+              .expect("Unable to append to bufwriter do to io error.");
+          }
+        }
+        MatchResult::Unmatched(unmatched_char) => {
+          write!(bufwriter, "{}", unmatched_char)
+              .expect("Unable to write unmatched char to bufwriter do to io error.");
+        }
+      }
+    }
   } else {
     for match_result in match_iterator(& mut char_iter, pattern.to_string(), before_capacity, after_capacity) {
       match match_result {
         MatchResult::Match(before, found_match, after) => {
-          writeln!(bufwrite, "{}{}{}", before, found_match, after);
+          writeln!(bufwriter, "{}{}{}", before, found_match, after)
+              .expect("Unable to write match to bufwriter do to io error.");
         }
         MatchResult::Unmatched(_unmatched_char) => {}
       }
