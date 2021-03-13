@@ -38,6 +38,62 @@ pub fn match_iterator<'a>(
   };
 }
 
+impl MatchIterator<'_> {
+    
+  fn advance_char(&mut self, char_to_add: Option<char>) -> Option<(String, String, String)> {
+    // get the characters from the buffer to compare with the pattern
+    let mut matched = true;
+    for pattern_char in self.pattern.chars() {
+      match self.buffer.pop_front() {
+        Some(input_char) => {
+          self.comparison_buffer.push_back(input_char);
+          if pattern_char != input_char {
+            matched = false; // too short
+            break;
+          }
+        },
+        None => {
+          matched = false; // too short
+          break;
+        },
+      }
+    }
+
+    // found a match, record it to send later
+    let current_result = if matched {
+      Some((
+        self.before_buffer.iter().collect::<String>(),
+        self.comparison_buffer.iter().collect::<String>(),
+        self.buffer.iter().collect::<String>()
+      ))
+    } else {
+      None
+    };
+
+    // put all the characters into the buffer except the first one
+    while let Some(put_back_char) = self.comparison_buffer.pop_back() {
+      self.buffer.push_front(put_back_char);
+    }
+    if self.before_buffer.len() >= self.before_capacity {
+      self.before_buffer.pop_front();
+    }
+    // at this point buffer is at buffer_capacity
+    let leaving_buffer = self.buffer.pop_front().unwrap();
+    // buffer is at buffer_capacity - 1 
+    if self.before_buffer.len() < self.before_capacity {
+      self.before_buffer.push_back(leaving_buffer);
+    }
+
+    // add another character so that we have buffer_capacity again
+    if char_to_add.is_some() {
+      self.buffer.push_back(char_to_add.unwrap());
+    }
+
+    return current_result;
+  }
+
+}
+
 impl Iterator for MatchIterator<'_> {
   type Item = (String, String, String);
 
@@ -47,106 +103,22 @@ impl Iterator for MatchIterator<'_> {
     // 3. if the before buffer is filled, remove the oldest character form the before_buffer
 
     while let Some(c) = self.char_iter.next() {
-      // get the characters from the buffer to compare with the pattern
-      let mut matched = true;
-      for pattern_char in self.pattern.chars() {
-        match self.buffer.pop_front() {
-          Some(input_char) => {
-            self.comparison_buffer.push_back(input_char);
-            if pattern_char != input_char {
-              matched = false; // too short
-              break;
-            }
-          },
-          None => {
-            matched = false; // too short
-            break;
-          },
+      match self.advance_char(Some(c)) {
+        Some((before,matched,after)) => {
+          return Some((before,matched,after));
         }
-      }
-
-      // found a match, record it to send later
-      let current_result = if matched {
-        Some((
-          self.before_buffer.iter().collect::<String>(),
-          self.comparison_buffer.iter().collect::<String>(),
-          self.buffer.iter().collect::<String>()
-        ))
-      } else {
-        None
-      };
-
-      // put all the characters into the buffer except the first one
-      while let Some(put_back_char) = self.comparison_buffer.pop_back() {
-        self.buffer.push_front(put_back_char);
-      }
-      if self.before_buffer.len() >= self.before_capacity {
-        self.before_buffer.pop_front();
-      }
-      // at this point buffer is at buffer_capacity
-      let leaving_buffer = self.buffer.pop_front().unwrap();
-      // buffer is at buffer_capacity - 1 
-      if self.before_buffer.len() < self.before_capacity {
-        self.before_buffer.push_back(leaving_buffer);
-      }
-
-      // add another character so that we have buffer_capacity again
-      self.buffer.push_back(c);
-
-      // found a match, return it
-      if current_result.is_some() {
-        return current_result;
+        None => {}
       }
     }
 
     // process the remaining characters in the buffer
     // can exit early if the buffer is smaller than the pattern
     while self.buffer.len() >= self.pattern.len() {
-      // get the characters from the buffer to compare with the pattern
-      let mut matched = true;
-      for pattern_char in self.pattern.chars() {
-        match self.buffer.pop_front() {
-          Some(input_char) => {
-              self.comparison_buffer.push_back(input_char);
-              if pattern_char != input_char {
-                  matched = false; // too short
-                  break;
-              }
-          },
-          None => {
-              matched = false; // too short
-              break;
-          },
+      match self.advance_char(None) {
+        Some((before,matched,after)) => {
+          return Some((before,matched,after));
         }
-      }
-
-      // found a match, record it to send later
-      let current_result = if matched {
-        Some((
-          self.before_buffer.iter().collect::<String>(),
-          self.comparison_buffer.iter().collect::<String>(),
-          self.buffer.iter().collect::<String>()
-        ))
-      } else {
-        None
-      };
-
-      // put all the characters into the buffer except the first one
-      while let Some(put_back_char) = self.comparison_buffer.pop_back() {
-        self.buffer.push_front(put_back_char);
-      }
-      if self.before_buffer.len() >= self.before_capacity {
-        self.before_buffer.pop_front();
-      }
-      let leaving_buffer = self.buffer.pop_front().unwrap();
-      // buffer is at buffer_capacity - 1 
-      if self.before_buffer.len() < self.before_capacity {
-        self.before_buffer.push_back(leaving_buffer);
-      }
-      
-      // found a match, return it
-      if current_result.is_some() {
-        return current_result;
+        None => {}
       }
     }
 
