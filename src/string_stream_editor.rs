@@ -60,6 +60,7 @@ pub fn process_string_stream_bufread_bufwrite<'a> (
     prepend: Option<&str>,
     append: Option<&str>
 ) {
+  // TODO: handle escaped \n in pattern, replace, prepend, and append
   let mut char_iter  = get_iterator(bufread, is_ascii);
   if replace.is_some() || prepend.is_some() || append.is_some() {
     for match_result in match_iterator(& mut char_iter, pattern.to_string(), 0, 0) {

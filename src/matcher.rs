@@ -48,11 +48,6 @@ pub fn match_iterator<'a>(
 impl MatchIterator<'_> {
     
   fn advance_char(&mut self, char_to_add: Option<char>) -> MatchResult {
-    println!("DEBUG\n\t{}\n\t{}",
-      self.before_buffer.iter().collect::<String>(),
-      self.buffer.iter().collect::<String>()
-    );
-
     // 1. process the current character
     // 2. remove the character from the buffer and place it into the before_buffer
     // 3. if the before buffer is filled, remove the oldest character form the before_buffer

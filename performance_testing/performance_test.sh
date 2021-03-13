@@ -12,6 +12,17 @@ function invoke_lll {
 		> tmp/matches.lll.$num_chars.txt < $text_file
 }
 
+function invoke_lll_append {
+  text_file=$1
+  repeated_text=$2
+  num_chars=$3
+  ../target/release/lll \
+		--pattern $repeated_text \
+		--append "
+" \
+		> tmp/append.lll.$num_chars.txt < $text_file
+}
+
 function invoke_lll_ascii {
   text_file=$1
   repeated_text=$2
@@ -22,6 +33,18 @@ function invoke_lll_ascii {
 		--before 100 \
 		--after 100 \
 		> tmp/matches.lll_ascii.$num_chars.txt < $text_file
+}
+
+function invoke_lll_ascii_append {
+  text_file=$1
+  repeated_text=$2
+  num_chars=$3
+  ../target/release/lll \
+		--ascii \
+		--pattern $repeated_text \
+		--append "
+" \
+		> tmp/append.lll_ascii.$num_chars.txt < $text_file
 }
 
 function invoke_rg {
@@ -40,6 +63,22 @@ function invoke_grep {
   grep \
 		--only-matching ".{0,100}$repeated_text.{0,100}" \
 		> tmp/matches.grep.$num_chars.txt < $text_file
+}
+
+function invoke_sed {
+  text_file=$1
+  repeated_text=$2
+  num_chars=$3
+	sed 's/'$repeated_text/$repeated_text'\n/g' $text_file \
+		> tmp/append.sed.$num_chars.txt
+}
+
+function invoke_tr {
+  text_file=$1
+  repeated_text=$2
+  num_chars=$3
+  tr "0" '\n' \
+		> tmp/append.tr.$num_chars.txt < $text_file
 }
 
 
@@ -68,6 +107,16 @@ if test -f "../target/release/lll"; then
 				time invoke_rg "$text_file" "$repeated_text" "$num_chars"
 				echo grep
 				time invoke_grep "$text_file" "$repeated_text" "$num_chars"
+				echo lll_append
+				time invoke_lll_append "$text_file" "$repeated_text" "$num_chars"
+				echo lll_ascii_append
+				time invoke_lll_ascii_append "$text_file" "$repeated_text" "$num_chars"
+				echo sed
+				time invoke_sed "$text_file" "$repeated_text" "$num_chars"
+				# even though tr doesn't have the same functionality as replacing
+				# strings, we use it as a performance lower bound.
+				echo tr 
+				time invoke_tr "$text_file" "$repeated_text" "$num_chars"
 			else
 				echo "$repeated_file does not exist. run ./generate_files.sh"
 			fi
