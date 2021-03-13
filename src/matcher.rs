@@ -90,7 +90,10 @@ impl MatchIterator<'_> {
         if self.before_buffer.len() >= self.before_capacity {
           self.before_buffer.pop_front();
         }
-        self.before_buffer.push_back(transfer_to_before_char);
+        // before buffer might have 0 capacity so we need this extra check
+        if self.before_buffer.len() < self.before_capacity {
+          self.before_buffer.push_back(transfer_to_before_char);
+        }
       }
 
       // add another character so that we have buffer_capacity again
