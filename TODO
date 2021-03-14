@@ -16,9 +16,9 @@ DONE do split performance testing comparison with sed 's/pattern/\npattern/g'
 DONE option to replace pattern instead of search for matches (just like tr but
      string instead of characters
 DONE option to append after pattern instead of search for matches
-- fix bug with characters missing at the end 
-  diff tmp/append.lll.1000000.txt tmp/append.sed.1000000.txt 
-  to reproduce
+DONE fix bug with characters missing at the end 
+     diff tmp/append.lll.1000000.txt tmp/append.sed.1000000.txt 
+     to reproduce
 - determine why --append is so much slower than matching and sed
 - motivation
 	- large files misbehaving in less and vim

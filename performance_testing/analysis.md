@@ -2,6 +2,7 @@
 
 String::push
 ===========================
+![flame graph: string push root cause](https://raw.githubusercontent.com/josephmate/LongLineLasso/main/performance_testing/flame_graph_v1.svg)
 Flame graph shows about 1/3 of the time is spent appending strings.
 Like this code code is the root cause:
 ```
@@ -41,6 +42,7 @@ I was expecting about a 100x improvement.
 
 utf8_chars::BufReadCharsExt::read_char_raw
 =========================================
+![flame graph: string push root cause](https://raw.githubusercontent.com/josephmate/LongLineLasso/main/performance_testing/flame_graph_v2.svg)
 Reading the characters takes about 50% of the time now.
 I'm not sure where to go from here.
 I'm assuming that the bytes are read into a buffer,
@@ -51,6 +53,7 @@ Maybe we can make it a flag like `--ascii`?
 
 Dropping utf_chars in favour of only ascii
 ==========================================
+![flame graph: string push root cause](https://raw.githubusercontent.com/josephmate/LongLineLasso/main/performance_testing/flame_graph_v3.svg)
 Performance experiments show a drop from 34 to 24 seconds.
 This improvement is much smaller than I was expecting.
 By using ascii, I was hoping that I would have similar performance to grep and rg.
@@ -65,9 +68,18 @@ Maybe we need to buffer it ourselfs?
 
 vs. sed and tr
 =============
-I'm happy that lll peforms better than sed.
-However, my goal is for lll to peform as close as possible to tr.
-This is achievable because we're not doing regex,
-we're only appending or replacing based on a string,
-which I expect to have similar performance to replacing based on a character.
+~I'm happy that lll peforms better than sed.~
+~However, my goal is for lll to peform as close as possible to tr.~
+~This is achievable because we're not doing regex,~
+~we're only appending or replacing based on a string,~
+~which I expect to have similar performance to replacing based on a character.~
+Turns out this was incorrect.
+When I finally implemented append,
+it performed significantly worse than printing matches.
 
+append performance issues
+========================
+![flame graph: string push root cause](https://raw.githubusercontent.com/josephmate/LongLineLasso/main/performance_testing/flame_graph_append_v4.svg)
+Flame graphs show that most of the time is spent in write.
+I suspect it's because standard out is not buffered properly.
+I will try to wrap my output using some sort of buffer struct and see what happens.
