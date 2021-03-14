@@ -117,17 +117,17 @@ pub fn process_string_stream_bufread_bufwrite<'a> (
 mod tests {
     // Note this useful idiom: importing names from outer (for mod tests) scope.
     use super::*;
-    use std::io::BufWriter;
-
-    #[test]
-    fn test_empty() {
-      let mut input = b"" as &[u8];
-      let patten = "abc";
-      let output = Vec::new();
-      let output_buffer = BufWriter::new(output);
+    
+    fn test_append(
+        pattern: &str,
+        input: &str,
+        expected: &str
+    ) {
+      let mut input_bytes = input.as_bytes();
+      let mut output = Vec::new();
       process_string_stream_bufread_bufwrite(
-        input,
-        output,
+        &mut input_bytes,
+        &mut output,
         pattern,
         0, // before capacity
         0, // after capacity
@@ -136,8 +136,44 @@ mod tests {
         None, //prepend
         Some("\\n") //append
       );
-      output_buffer.flush();
-      assert_eq!(output.
+      assert_eq!(String::from_utf8(output).unwrap(),
+        expected.to_string());
+    }
+
+    #[test]
+    fn test_append_empty() {
+      test_append(
+        "abc", // pattern
+        "", // input
+        "" // expected
+      );
+    }
+
+    #[test]
+    fn test_append_once() {
+      test_append(
+        "abc", // pattern
+        "abc", // input
+        "abc\n" // expected
+      );
+    }
+
+    #[test]
+    fn test_append_once_unmatched_after() {
+      test_append(
+        "abc", // pattern
+        "abcaaaaaa", // input
+        "abc\naaaaaa" // expected
+      );
+    }
+
+    #[test]
+    fn test_append_twice() {
+      test_append(
+        "abc", // pattern
+        "abcabc", // input
+        "abc\nabc\n" // expected
+      );
     }
 }
 

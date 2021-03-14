@@ -147,7 +147,7 @@ impl Iterator for MatchIterator<'_> {
 
     // process the remaining characters in the buffer
     // can exit early if the buffer is smaller than the pattern
-    if self.buffer.len() >= self.pattern.len() {
+    if self.buffer.len() > 0 {
       return Some(self.advance_char(None));
     } else {
       return None;
