@@ -49,36 +49,48 @@ impl Iterator for CharIterator<'_> {
   }
 }
 
+fn unescape_str(escaped: &str) -> String {
+  return escaped.to_string()
+      .replace("\\n", "\n")
+      .replace("\\\\", "\\");
+}
+
 pub fn process_string_stream_bufread_bufwrite<'a> (
     bufread: &'a mut dyn BufRead,
     bufwriter: &'a mut dyn Write,
-    pattern: &'a str,
+    escaped_pattern: &'a str,
     before_capacity: usize,
     after_capacity: usize,
     is_ascii: bool,
-    replace: Option<&str>,
-    prepend: Option<&str>,
-    append: Option<&str>
+    escaped_replace: Option<&str>,
+    escaped_prepend: Option<&str>,
+    escaped_append: Option<&str>
 ) {
-  // TODO: handle escaped \n in pattern, replace, prepend, and append
+  // escape \n to \n
+  // then escape \\ to \
+  let pattern = unescape_str(escaped_pattern);
+  let replace = escaped_replace.map(unescape_str);
+  let prepend = escaped_prepend.map(unescape_str);
+  let append = escaped_append.map(unescape_str);
+
   let mut char_iter  = get_iterator(bufread, is_ascii);
   if replace.is_some() || prepend.is_some() || append.is_some() {
-    for match_result in match_iterator(& mut char_iter, pattern.to_string(), 0, 0) {
+    for match_result in match_iterator(& mut char_iter, pattern, 0, 0) {
       match match_result {
         MatchResult::Match(_, found_match, _) => {
           if prepend.is_some() {
-            write!(bufwriter, "{}", prepend.unwrap())
+            write!(bufwriter, "{}", prepend.as_ref().unwrap())
               .expect("Unable to prepend to bufwriter do to io error.");
           }
           if replace.is_some() {
-            write!(bufwriter, "{}", replace.unwrap())
+            write!(bufwriter, "{}", replace.as_ref().unwrap())
               .expect("Unable to replace to bufwriter do to io error.");
           } else {
             write!(bufwriter, "{}", found_match)
               .expect("Unable to write to bufwriter do to io error.");
           }
           if append.is_some() {
-            write!(bufwriter, "{}", append.unwrap())
+            write!(bufwriter, "{}", append.as_ref().unwrap())
               .expect("Unable to append to bufwriter do to io error.");
           }
         }
@@ -89,7 +101,7 @@ pub fn process_string_stream_bufread_bufwrite<'a> (
       }
     }
   } else {
-    for match_result in match_iterator(& mut char_iter, pattern.to_string(), before_capacity, after_capacity) {
+    for match_result in match_iterator(& mut char_iter, pattern, before_capacity, after_capacity) {
       match match_result {
         MatchResult::Match(before, found_match, after) => {
           writeln!(bufwriter, "{}{}{}", before, found_match, after)
@@ -100,3 +112,32 @@ pub fn process_string_stream_bufread_bufwrite<'a> (
     }
   }
 }
+
+#[cfg(test)]
+mod tests {
+    // Note this useful idiom: importing names from outer (for mod tests) scope.
+    use super::*;
+    use std::io::BufWriter;
+
+    #[test]
+    fn test_empty() {
+      let mut input = b"" as &[u8];
+      let patten = "abc";
+      let output = Vec::new();
+      let output_buffer = BufWriter::new(output);
+      process_string_stream_bufread_bufwrite(
+        input,
+        output,
+        pattern,
+        0, // before capacity
+        0, // after capacity
+        true, // is_ascii
+        None, //replace
+        None, //prepend
+        Some("\\n") //append
+      );
+      output_buffer.flush();
+      assert_eq!(output.
+    }
+}
+
