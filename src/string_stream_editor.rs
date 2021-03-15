@@ -4,14 +4,21 @@ use std::io::Write;
 use crate::matcher::*;
 
 struct CharIterator<'a> {
-    buf_read: &'a mut dyn BufRead
+    buf_read: &'a mut dyn BufRead,
+    input_buffer: &'a mut [u8],
+    input_num_bytes_buffered: usize,
+    input_buffer_read: usize
 }
 
 fn char_iterator<'a>(
-    buf_read: &'a mut dyn BufRead
+    buf_read: &'a mut dyn BufRead,
+    input_buffer: &'a mut [u8]
 ) -> Box<dyn Iterator<Item=char> + 'a> {
     Box::new(CharIterator {
-        buf_read: buf_read
+        buf_read: buf_read,
+        input_buffer: input_buffer,
+        input_num_bytes_buffered: 0,
+        input_buffer_read: 0
     })
 }
 
@@ -23,10 +30,11 @@ fn utf_iterator<'a>(
 
 fn get_iterator<'a>(
     buf_read: &'a mut dyn BufRead,
-    is_ascii: bool
+    is_ascii: bool,
+    input_buffer: &'a mut [u8],
 ) -> Box<dyn Iterator<Item=char> + 'a> {
   if is_ascii {
-      char_iterator(buf_read)
+      char_iterator(buf_read, input_buffer)
   } else {
       utf_iterator(buf_read)
   }
@@ -36,53 +44,61 @@ impl Iterator for CharIterator<'_> {
   type Item = char;
 
   fn next(&mut self) -> Option<char> {
-    let mut buf = [0];
-    match self.buf_read.read(&mut buf) {
-        Ok(bytes_read) =>
-            if bytes_read == 0 {
-                None
-            } else {
-                Some(buf[0] as char)
-            },
-        Err(_) => None
+    if self.input_buffer_read >= self.input_num_bytes_buffered {
+      match self.buf_read.read(&mut self.input_buffer) {
+          Ok(bytes_read) =>
+              if bytes_read == 0 {
+                  return None;
+              } else {
+                  self.input_buffer_read = 0;
+                  self.input_num_bytes_buffered = bytes_read;
+              },
+          // TODO: bubble up the error and report it to the user instead of ending the stream
+          Err(_) => {
+            return None;
+          }
+      }
     }
+    let result = Some(self.input_buffer[self.input_buffer_read] as char);
+    self.input_buffer_read = self.input_buffer_read + 1;
+    return result;
   }
 }
 
 struct OutputBuffer<'a> {
     write: &'a mut dyn Write,
-    buffer: &'a mut [u8],
-    buffer_capacity: usize,
-    buffer_used: usize
+    output_buffer: &'a mut [u8],
+    output_buffer_capacity: usize,
+    output_buffer_used: usize
 }
 
 impl OutputBuffer<'_> {
 
   fn append_char(&mut self, to_add: char) -> std::io::Result<()> {
     let byte_len = to_add.len_utf8();
-    if byte_len + self.buffer_used > self.buffer_capacity {
+    if byte_len + self.output_buffer_used > self.output_buffer_capacity {
       self.flush()?;
     }
-    to_add.encode_utf8(&mut self.buffer[self.buffer_used..]);
-    self.buffer_used = self.buffer_used + byte_len;
+    to_add.encode_utf8(&mut self.output_buffer[self.output_buffer_used..]);
+    self.output_buffer_used = self.output_buffer_used + byte_len;
     Ok(())
   }
 
   fn append_str(&mut self, to_add: &str) -> std::io::Result<()> {
     for b in to_add.bytes() {
-      if self.buffer_used >= self.buffer_capacity {
+      if self.output_buffer_used >= self.output_buffer_capacity {
         self.flush()?;
       }
-      self.buffer[self.buffer_used] = b;
-      self.buffer_used = self.buffer_used + 1;
+      self.output_buffer[self.output_buffer_used] = b;
+      self.output_buffer_used = self.output_buffer_used + 1;
     }
     Ok(())
   }
 
   fn flush(&mut self) -> std::io::Result<()> {
-    if self.buffer_used > 0 {
-      self.write.write_all(&self.buffer[..self.buffer_used])?;
-      self.buffer_used = 0;
+    if self.output_buffer_used > 0 {
+      self.write.write_all(&self.output_buffer[..self.output_buffer_used])?;
+      self.output_buffer_used = 0;
     }
     Ok(())
   }
@@ -116,15 +132,15 @@ pub fn process_string_stream_bufread_bufwrite<'a> (
   let append = escaped_append.map(unescape_str);
   
   // we could make this configurable
-  let mut buffer = [0; BUFFER_CAPACITY];
+  let mut output_buffer_array = [0; BUFFER_CAPACITY];
   let mut output_buffer = OutputBuffer {
     write: write,
-    buffer: &mut buffer,
-    buffer_capacity: BUFFER_CAPACITY,
-    buffer_used: 0
+    output_buffer: &mut output_buffer_array,
+    output_buffer_capacity: BUFFER_CAPACITY,
+    output_buffer_used: 0
   };
-
-  let mut char_iter  = get_iterator(bufread, is_ascii);
+  let mut input_buffer = [0; BUFFER_CAPACITY];
+  let mut char_iter = get_iterator(bufread, is_ascii, &mut input_buffer);
   if replace.is_some() || prepend.is_some() || append.is_some() {
     for match_result in match_iterator(& mut char_iter, pattern, 0, 0) {
       match match_result {

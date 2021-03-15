@@ -94,7 +94,14 @@ match performance issues
 ========================
 ![flame graph: iterating chars root cause](https://raw.githubusercontent.com/josephmate/LongLineLasso/main/performance_testing/flame_graph_match_v5.svg)
 I suspect I have the same issue with append: I need to use a buffer.
-This shocks me though because rust stdin says it used BufRead which is buffered.
-It might be that I have to use the BufRead methods and not the Read methods to
-be able to exploit the buffer.
+This shocks me though because rust stdin says it used BufRead which is buffered. 
 For now, I'll build my my own buffer and see what happens.
+
+input buffer had no effect
+=============
+![flame graph: input buffer had no effect](https://raw.githubusercontent.com/josephmate/LongLineLasso/main/performance_testing/flame_graph_match_v6.svg)
+Input buffer didn't improve performance.
+The documentation is correct about BufRead.
+I verified by reading through the [BufReader source code](https://github.com/rust-lang/rust/blob/8fd946c63a6c3aae9788bd459d278cb2efa77099/library/std/src/io/buffered/bufreader.rs).
+As a result, I need to keep digging.
+Does the flame graph show all sys calls or is `<lll::matcher::MatchIterator as core::iter::traits::iterator::Iterator>::next` really the top of the stack 30% of the time?
