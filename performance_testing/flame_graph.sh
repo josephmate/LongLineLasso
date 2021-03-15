@@ -7,7 +7,7 @@ then
 fi
 experiment_type=$1
 
-if [[ "match" -ne "$experiment_type" && "append" -ne "$experiment_type" ]]
+if [[ "match" != "$experiment_type" && "append" != "$experiment_type" ]]
 then
 	echo "./flame_graph.sh [match|append]"
 	exit -1
@@ -20,7 +20,7 @@ append_mode=""
 append_value=""
 output_path=tmp/profile_match.svg
 lll_output_path=tmp/matches.lll_ascii.$num_chars.txt
-if [[ "append" -eq "$experiment_type" ]]
+if [[ "append" == "$experiment_type" ]]
 then
 	append_mode="--append"
 	append_value="\n"

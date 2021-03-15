@@ -1,0 +1,172 @@
+tmp/large_file.1000000.txt
+tmp/repeated.1000000.txt
+NhzvRcmLtIOtWgrpJPDcBHxS6E9PcLxFgXfWuOcTpPj4KLG9sCD5n10oSqIXGuAbSVdOts5Iig8xC7loejWL427M6AtG5pd5Xxhi
+lll
+
+real	0m0.084s
+user	0m0.073s
+sys	0m0.005s
+lll_ascii
+
+real	0m0.063s
+user	0m0.058s
+sys	0m0.005s
+rg
+
+real	0m0.297s
+user	0m0.217s
+sys	0m0.017s
+grep
+
+real	0m0.004s
+user	0m0.000s
+sys	0m0.005s
+lll_append
+
+real	0m0.072s
+user	0m0.067s
+sys	0m0.005s
+lll_ascii_append
+
+real	0m0.057s
+user	0m0.049s
+sys	0m0.008s
+sed
+
+real	0m0.016s
+user	0m0.008s
+sys	0m0.008s
+tr
+
+real	0m0.034s
+user	0m0.005s
+sys	0m0.004s
+tmp/large_file.10000000.txt
+tmp/repeated.10000000.txt
+sVX1TGBNC8kk9UEtcI3Em88uOpdHan69L6ZRSbHaUtTqMkHS3Yq6EGn7plFaZLLSsycSLAcumcvsOfue5nqGN49MDxvaR9yZbu4R
+lll
+
+real	0m0.610s
+user	0m0.582s
+sys	0m0.012s
+lll_ascii
+
+real	0m0.458s
+user	0m0.446s
+sys	0m0.012s
+rg
+
+real	0m0.201s
+user	0m0.185s
+sys	0m0.016s
+grep
+
+real	0m0.036s
+user	0m0.012s
+sys	0m0.024s
+lll_append
+
+real	0m0.630s
+user	0m0.583s
+sys	0m0.016s
+lll_ascii_append
+
+real	0m0.544s
+user	0m0.463s
+sys	0m0.024s
+sed
+
+real	0m0.091s
+user	0m0.025s
+sys	0m0.042s
+tr
+
+real	0m0.030s
+user	0m0.013s
+sys	0m0.017s
+tmp/large_file.100000000.txt
+tmp/repeated.100000000.txt
+EPGJewwdBI0L0fD5KNfW3zaGjumzz4PzSfaBbgejcpd9q2lKFXyLyoMvS8fe0uNUtHP4UjyQwB5PjbRPSVeYCklbajwEhqL79IM5
+lll
+
+real	0m5.780s
+user	0m5.689s
+sys	0m0.064s
+lll_ascii
+
+real	0m4.490s
+user	0m4.473s
+sys	0m0.016s
+rg
+
+real	0m0.469s
+user	0m0.361s
+sys	0m0.107s
+grep
+
+real	0m0.311s
+user	0m0.141s
+sys	0m0.168s
+lll_append
+
+real	0m6.261s
+user	0m5.657s
+sys	0m0.112s
+lll_ascii_append
+
+real	0m5.190s
+user	0m4.534s
+sys	0m0.164s
+sed
+
+real	0m0.927s
+user	0m0.208s
+sys	0m0.315s
+tr
+
+real	0m0.648s
+user	0m0.063s
+sys	0m0.167s
+tmp/large_file.1000000000.txt
+tmp/repeated.1000000000.txt
+UZ8tIIKa93I5DgQqTSpKDZxxIZbjWVSCnzAnyPrN9GsIRowR29m6Bkzrm6safUsbYjjCVkU4FYGXqMiUgteq7t2dTBfOyoGupTFb
+lll
+
+real	0m58.102s
+user	0m57.398s
+sys	0m0.500s
+lll_ascii
+
+real	0m44.758s
+user	0m44.436s
+sys	0m0.304s
+rg
+
+real	0m3.133s
+user	0m2.118s
+sys	0m1.009s
+grep
+
+real	0m3.500s
+user	0m1.599s
+sys	0m1.889s
+lll_append
+
+real	0m59.822s
+user	0m56.879s
+sys	0m1.264s
+lll_ascii_append
+
+real	0m49.496s
+user	0m46.785s
+sys	0m1.311s
+sed
+
+real	0m10.005s
+user	0m2.436s
+sys	0m3.254s
+tr
+
+real	0m6.534s
+user	0m0.659s
+sys	0m1.608s

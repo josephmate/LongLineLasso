@@ -76,6 +76,8 @@ vs. sed and tr
 Turns out this was incorrect.
 When I finally implemented append,
 it performed significantly worse than printing matches.
+Also, I discovered a bug in the performance testing where I used --debug flag in
+sed which would significantly reduce it performance.
 
 append performance issues
 ========================
@@ -83,3 +85,16 @@ append performance issues
 Flame graphs show that most of the time is spent in write.
 I suspect it's because standard out is not buffered properly.
 I will try to wrap my output using some sort of buffer struct and see what happens.
+
+![flame graph: string push fixed](https://raw.githubusercontent.com/josephmate/LongLineLasso/main/performance_testing/flame_graph_append_v5.svg)
+After adding an output buffer the performance of append came down similar to
+match's performance.
+
+match performance issues
+========================
+![flame graph: iterating chars root cause](https://raw.githubusercontent.com/josephmate/LongLineLasso/main/performance_testing/flame_graph_match_v5.svg)
+I suspect I have the same issue with append: I need to use a buffer.
+This shocks me though because rust stdin says it used BufRead which is buffered.
+It might be that I have to use the BufRead methods and not the Read methods to
+be able to exploit the buffer.
+For now, I'll build my my own buffer and see what happens.
