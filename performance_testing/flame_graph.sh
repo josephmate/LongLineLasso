@@ -28,6 +28,22 @@ then
 	lll_output_path=tmp/append.lll_ascii.$num_chars.txt
 fi
 
+kptr_status=$(cat /proc/sys/kernel/kptr_restrict)
+if [[ "$kptr_status" != "0" ]]
+then
+	echo "WARNING: you should probably"
+	echo "sudo sh -c 'echo 0 > /proc/sys/kernel/kptr_restrict'"
+	echo "cat /proc/sys/kernel/kptr_restrict"
+	echo "also this is helpful"
+	echo "also install debug symbols TODO"
+	echo "visit https://wiki.ubuntu.com/Debug%20Symbol%20Packages"
+	echo "to tell you how to add debug symbol repositories to your ubuntu"
+	echo "sudo apt install -y linux-image-`uname -r`-dbgsym"
+	echo "will install the debug symbols"
+fi
+
+
+
 if test -f "../target/release/lll"; then
 	# If running from windows linux sub system make sure to build perf from source:
 	# https://stackoverflow.com/questions/60237123/is-there-any-method-to-run-perf-under-wsl
