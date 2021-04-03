@@ -18,14 +18,14 @@ repeated_file="tmp/repeated.$num_chars.txt"
 repeated_text=$(<$repeated_file)
 append_mode=""
 append_value=""
-output_path=tmp/profile_match.svg
-lll_output_path=tmp/matches.lll_ascii.$num_chars.txt
+output_path=tmp/flame_graph_$experiment_type.svg
+perf_record_path=tmp/lll.$experiment_type.perf.out
+folded_stacks_path=tmp/stacks.lll.$experiment_type.folded
+lll_output_path=tmp/$experiment_type.lll_ascii.$num_chars.txt
 if [[ "append" == "$experiment_type" ]]
 then
 	append_mode="--append"
 	append_value="\n"
-	output_path=tmp/profile_append.svg
-	lll_output_path=tmp/append.lll_ascii.$num_chars.txt
 fi
 
 kptr_status=$(cat /proc/sys/kernel/kptr_restrict)
@@ -50,7 +50,7 @@ if test -f "../target/release/lll"; then
 	sudo perf \
 		record \
 		--call-graph dwarf \
-		--output tmp/lll.perf.out \
+		--output $perf_record_path \
 		../target/release/lll \
 		  --ascii \
 			--pattern $repeated_text \
@@ -60,10 +60,10 @@ if test -f "../target/release/lll"; then
 		> $lll_output_path \
 		< $text_file
 	
-	sudo chown $USER:$USER tmp/lll.perf.out
+	sudo chown $USER:$USER $perf_record_path
 
-	perf script --input tmp/lll.perf.out |  inferno-collapse-perf > tmp/stacks.folded
-	inferno-flamegraph > $output_path < tmp/stacks.folded
+	perf script --input $perf_record_path |  inferno-collapse-perf > $folded_stacks_path
+	inferno-flamegraph > $output_path < $folded_stacks_path
 else
 	echo ../target/release/lll not found. Please build lll before generating the flamegraph
 fi
